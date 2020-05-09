@@ -8,6 +8,9 @@ import './style/index.less'
 import Vant from 'vant'
 // 加载vant组件库样式
 import 'vant/lib/index.css'
+// 自动设置rem基准值(html标签字体大小)
+import 'amfe-flexible'
+
 // 全局注册vant组件
 Vue.use(Vant)
 Vue.config.productionTip = false
