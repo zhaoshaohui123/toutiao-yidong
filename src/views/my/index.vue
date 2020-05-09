@@ -1,10 +1,10 @@
 <template>
-  <div class="login-container">登陆页面</div>
+  <div class="my-container">我的页面</div>
 </template>
 
 <script>
 export default {
-  name: 'LoginIndex',
+  name: 'MyIndex',
   components: {},
   props: {},
   data () {

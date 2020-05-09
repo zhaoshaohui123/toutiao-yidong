@@ -1,10 +1,10 @@
 <template>
-  <div class="login-container">登陆页面</div>
+  <div class="video-container">视频页面</div>
 </template>
 
 <script>
 export default {
-  name: 'LoginIndex',
+  name: 'VideoIndex',
   components: {},
   props: {},
   data () {

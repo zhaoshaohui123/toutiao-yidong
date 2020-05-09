@@ -1,10 +1,10 @@
 <template>
-  <div class="login-container">登陆页面</div>
+  <div class="qa-container">问答页面</div>
 </template>
 
 <script>
 export default {
-  name: 'LoginIndex',
+  name: 'QaIndex',
   components: {},
   props: {},
   data () {
