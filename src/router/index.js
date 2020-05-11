@@ -10,7 +10,7 @@ const routes = [
     name: 'login',
     component: () => import('@/views/login')
   },
-  {
+  { // 一级路由渲染到根组件中的 router-view
     path: '/',
     component: () => import('@/views/layout'),
     children: [
