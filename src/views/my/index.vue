@@ -1,10 +1,8 @@
 <template>
   <div class="my-container">
-    <van-cell-group class="my-info">
+    <van-cell-group v-if="user" class="my-info">
       <van-cell
         class="base-info"
-        title="单元格"
-        value="内容"
         center
         :border="false"
       >
@@ -13,9 +11,9 @@
           slot="icon"
           round
           fit="cover"
-          src="https://img.yzcdn.cn/vant/cat.jpeg"
+          :src="currentUser.photo"
         />
-        <div class="name" slot="title">昵称</div>
+        <div class="name" slot="title">{{ currentUser.name }}</div>
         <van-button
           class="update-btn"
           size="small"
@@ -25,30 +23,36 @@
       <van-grid class="data-info" :border="false">
         <van-grid-item class="data-info-item">
           <div slot="text" class="text-wrap">
-            <div class="count">123</div>
+            <div class="count">{{ currentUser.art_count }}</div>
             <div class="text">头条</div>
           </div>
         </van-grid-item>
         <van-grid-item class="data-info-item">
           <div slot="text" class="text-wrap">
-            <div class="count">123</div>
+            <div class="count">{{ currentUser.follow_count }}</div>
             <div class="text">关注</div>
           </div>
         </van-grid-item>
         <van-grid-item class="data-info-item">
           <div slot="text" class="text-wrap">
-            <div class="count">123</div>
+            <div class="count">{{ currentUser.fans_count }}</div>
             <div class="text">粉丝</div>
           </div>
         </van-grid-item>
         <van-grid-item class="data-info-item">
           <div class="text-wrap" slot="text">
-            <div class="count">123</div>
+            <div class="count">{{ currentUser.like_count }}</div>
             <div class="text">获赞</div>
           </div>
         </van-grid-item>
       </van-grid>
     </van-cell-group>
+    <div v-else class="not-login">
+      <div @click="$router.push('/login')">
+        <img class="mobile" src="">
+      </div>
+      <div class="text">登录 / 注册</div>
+    </div>
     <van-grid class="nav-grid mb-4" :column-num="2">
       <van-grid-item
         class="nav-grid-item"
@@ -65,23 +69,56 @@
     </van-grid>
     <van-cell title="消息通知" is-link to="/" />
     <van-cell class="mb-4" title="小智同学" is-link to="/" />
-    <van-cell class="logout-cell" title="退出登录" />
+    <van-cell
+      v-if="user"
+      class="logout-cell"
+      title="退出登录"
+      @click="onLogout"
+    />
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import { getCurrentUser } from '@/api/user'
 export default {
   name: 'MyIndex',
   components: {},
   props: {},
   data () {
-    return {}
+    return {
+      currentUser: {} // 当前登录用户信息
+    }
   },
-  computed: {},
+  computed: {
+    ...mapState(['user'])
+  },
   watch: {},
-  created () {},
+  created () {
+    this.loadCurrentUser()
+  },
   mounted () {},
-  methods: {}
+  methods: {
+    async loadCurrentUser () {
+      const { data } = await getCurrentUser()
+      this.currentUser = data.data
+    },
+    onLogout () {
+      // 提示用户确认退出
+      // 确认 -> 处理退出
+      this.$dialog.confirm({
+        title: '退出提示',
+        message: '确认退出吗？'
+      })
+        .then(() => { // 确认执行这里
+          // 清除用户登录状态
+          this.$store.commit('setUser', null)
+        })
+        .catch(() => { // 退出执行这里
+          // on cancel
+        })
+    }
+  }
 }
 </script>
 
@@ -133,6 +170,23 @@ export default {
     }
     /deep/ .van-grid-item__content {
       background-color: unset;
+    }
+  }
+   .not-login {
+    height: 180px;
+    background: url("./banner.png") no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .mobile {
+      width: 66px;
+      height: 66px;
+    }
+    .text {
+      font-size: 14px;
+      color: #fff;
     }
   }
   /deep/ .nav-grid {
