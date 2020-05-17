@@ -152,7 +152,6 @@ export default {
       }
     },
     switchChannel (index) {
-      console.log('切换频道')
       // 切换频道
       this.$emit('update-active', index)
 
