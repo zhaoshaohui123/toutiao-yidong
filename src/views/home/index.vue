@@ -168,7 +168,7 @@ export default {
     &:before {
       content: '';
       width: 1px;
-      background: url("") no-repeat;
+      // background: url("") no-repeat;
       background-size: contain;
       position: absolute;
       left: 0;

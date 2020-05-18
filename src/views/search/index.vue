@@ -35,6 +35,8 @@
     <search-history
       v-else
       :search-histories="searchHistories"
+      @search="onSearch"
+      @update-histories="searchHistories = $event"
     />
     <!-- /历史记录 -->
   </div>
@@ -45,7 +47,7 @@ import SearchSuggestion from './components/search-suggestion'
 import SearchHistory from './components/search-history'
 import SearchResult from './components/search-result'
 import { setItem, getItem } from '@/utils/storage'
-import { getSearchHistories } from '@/api/search'
+// import { getSearchHistories } from '@/api/search'
 import { mapState } from 'vuex'
 export default {
   name: 'SearchIndex',
@@ -65,14 +67,17 @@ export default {
   computed: {
     ...mapState(['user'])
   },
-  watch: {},
+  watch: {
+    searchHistories () {
+      setItem('search-histories', this.searchHistories)
+    }
+  },
   created () {
     this.loadSearchHistories()
   },
   mounted () {},
   methods: {
     onSearch (searchText) {
-      console.log('sss')
       this.searchText = searchText
       const index = this.searchHistories.indexOf(searchText)
       if (index !== -1) {
@@ -84,7 +89,7 @@ export default {
       // 如果用户已登录，则把搜索历史记录存储到线上
       // 提示：只要我们调用获取搜索结果的数据接口，后端会给我们自动存储用户的搜索历史记录
       // 如果没有登录页，则把搜索历史记录存储到本地
-      setItem('search-histories', this.searchHistories)
+      // setItem('search-histories', this.searchHistories)
       // 展示搜索结果
       this.isResultShow = true
     },
@@ -92,14 +97,14 @@ export default {
       // 因为后端帮我们存储的用户搜索历史记录太少了（只有4条）
       // 所以我们这里让后端返回的历史记录和本地的历史记录合并到一起
       // 如果用户已登录
-      let searchHistories = getItem('search-histories') || []
-      if (this.user) {
-        const { data } = await getSearchHistories()
-        searchHistories = [...new Set([
-          ...searchHistories,
-          ...data.data.keywords
-        ])]
-      }
+      const searchHistories = getItem('search-histories') || []
+      // if (this.user) {
+      //   const { data } = await getSearchHistories()
+      //   searchHistories = [...new Set([
+      //     ...searchHistories,
+      //     ...data.data.keywords
+      //   ])]
+      // }
       this.searchHistories = searchHistories
     }
   }
