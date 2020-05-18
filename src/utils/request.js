@@ -2,12 +2,20 @@
  * 请求模块
  */
 import axios from 'axios'
+import JSONbig from 'json-bigint'
 // 在非组件模块中获取 store 必须通过这种方式
 // 这里单独加载 store，和在组件中 this.$store 一个东西
 import store from '@/store/'
 
 const request = axios.create({
-  baseURL: 'http://ttapi.research.itcast.cn/' // 基础路径
+  baseURL: 'http://ttapi.research.itcast.cn/', // 基础路径
+  transformResponse: [function (data) {
+    try {
+      return JSONbig.parse(data)
+    } catch (err) {
+      return data
+    }
+  }]
 })
 
 // 请求拦截器
