@@ -37,7 +37,12 @@
         ref="article-content"
       ></div>
       <!-- 文章评论列表 -->
-      <comment-list  :source="articleId"/>
+      <comment-list
+      :source="articleId"
+      :list="commentList"
+      @updata-total-count="totalCommentCount = $event"
+      @reply-click="onReplyClick"
+      />
       <!-- /文章评论列表 -->
     </div>
      <!-- 底部区域 -->
@@ -47,10 +52,11 @@
         type="default"
         round
         size="small"
+        @click="isPostShow = true"
  >写评论</van-button>
       <van-icon
         name="comment-o"
-        info="123"
+        :info="totalCommentCount"
         color="#777"
       />
       <van-icon
@@ -66,6 +72,31 @@
       <van-icon name="share" color="#777777"></van-icon>
     </div>
     <!-- /底部区域 -->
+
+    <!-- 发布评论 -->
+    <van-popup
+      v-model="isPostShow"
+      position="bottom"
+    >
+      <post-comment
+      :target="articleId"
+      @post-success="onPostSuccess"
+      />
+    </van-popup>
+    <!-- /发布评论 -->
+    <!-- 评论回复 -->
+    <van-popup
+      v-model="isReplyShow"
+      position="bottom"
+    >
+      <comment-reply
+      v-if="isReplyShow"
+      :comment="replyComment"
+      :article-id="articleId"
+      @close="isReplyShow = false"
+      />
+    </van-popup>
+    <!-- /评论回复 -->
   </div>
 </template>
 
@@ -81,11 +112,15 @@ import {
 import { ImagePreview } from 'vant'
 import { addFollow, deleteFollow } from '@/api/user'
 import CommentList from './components/comment-list'
+import PostComment from './components/post-comment'
+import CommentReply from './components/comment-reply'
 
 export default {
   name: 'ArticleIndex',
   components: {
-    CommentList
+    CommentList,
+    PostComment,
+    CommentReply
   },
   // 在组件中获取动态路由参数：
   // 方式一：this.$route.params.articleId
@@ -101,7 +136,12 @@ export default {
     return {
       article: {}, // 文章数据对象
       isFollowLoading: false, // 关注用户按钮的 loading 状态
-      isCollectLoading: false // 收藏的 loading 状态
+      isCollectLoading: false, // 收藏的 loading 状态
+      isPostShow: false, // 控制发布评论的显示状态
+      commentList: [], // 文章评论列表
+      totalCommentCount: 0, // 评论总数据量
+      isReplyShow: false, // 控制回复的显示状态
+      replyComment: {} // 当前回复评论对象
     }
   },
   computed: {},
@@ -179,6 +219,15 @@ export default {
         this.article.attitude = 1
       }
       this.$toast.success(`${this.article.attitude === 1 ? '' : '取消'}点赞成功`)
+    },
+    onPostSuccess (comment) {
+      this.commentList.unshift(comment)
+      this.totalCommentCount++
+      this.isPostShow = false
+    },
+    onReplyClick (comment) {
+      this.replyComment = comment
+      this.isReplyShow = true
     }
   }
 }

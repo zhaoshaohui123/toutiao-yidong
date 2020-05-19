@@ -7,10 +7,11 @@
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <van-cell
+      <comment-item
         v-for="(comment, index) in list"
         :key="index"
-        :title="comment.content"
+        :comment="comment"
+        @reply-click="$emit('reply-click', $event)"
       />
     </van-list>
   </div>
@@ -18,18 +19,30 @@
 
 <script>
 import { getComments } from '@/api/comment'
+import CommentItem from './comment-item'
 export default {
   name: 'CommentList',
-  components: {},
+  components: {
+    CommentItem
+  },
   props: {
     source: {
       type: [Number, String, Object],
       required: true
+    },
+    type: {
+      type: String,
+      default: 'a'
+    },
+    list: {
+      type: Array,
+      // 数组或对象的默认值必须通过函数返回
+      default: () => {}
     }
   },
   data () {
     return {
-      list: [],
+      // list: [],
       loading: false,
       finished: false,
       offset: null, // 获取下一页数据的页码
@@ -44,11 +57,12 @@ export default {
     async onLoad () {
       // 1. 请求获取数据
       const { data } = await getComments({
-        type: 'a', // 评论类型，a-对文章(article)的评论，c-对评论(comment)的回复
-        source: this.source, // 源id，文章id或评论id
+        type: this.type, // 评论类型，a-对文章(article)的评论，c-对评论(comment)的回复
+        source: this.source.toString(), // 源id，文章id或评论id
         offset: this.offset, // 获取评论数据的偏移量，值为评论id，表示从此id的数据向后取，不传表示从第一页开始读取数据
         limit: this.limit // 每页大小
       })
+      this.$emit('updata-total-count', data.data.total_count)
       // 2. 把数据放到列表中
       const { results } = data.data
       this.list.push(...results)
